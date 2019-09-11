@@ -12,6 +12,7 @@ import 'image.dart';
 import 'mode.dart';
 import 'scaffold.dart';
 import 'scope.dart';
+import 'search.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
@@ -27,6 +28,7 @@ class ZefyrEditor extends StatefulWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
     this.imageDelegate,
+    this.searchDelegate,
     this.selectionControls,
     this.attrDelegate,
     this.physics,
@@ -63,6 +65,8 @@ class ZefyrEditor extends StatefulWidget {
   ///
   /// This delegate is required if embedding images is allowed.
   final ZefyrImageDelegate imageDelegate;
+
+  final ZefyrSearchDelegate searchDelegate;
 
   /// Optional delegate for building the text selection handles and toolbar.
   ///
@@ -117,6 +121,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
         key: _toolbarKey,
         editor: _scope,
         delegate: widget.toolbarDelegate,
+        searchDelegate: widget.searchDelegate,
       ),
     );
   }
