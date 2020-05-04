@@ -11,6 +11,13 @@ import 'mode.dart';
 import 'render_context.dart';
 import 'view.dart';
 
+int XX__debugId = 0;
+
+int getZefyrInstanceDebugId() {
+  XX__debugId += 1;
+  return XX__debugId;
+}
+
 /// Provides access to shared state of [ZefyrEditor] or [ZefyrView].
 ///
 /// A scope object can be created by an editable widget like [ZefyrEditor] in
@@ -25,6 +32,11 @@ import 'view.dart';
 class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
+  int _debugId = 0;
+
+  int get debugId => _debugId;
+
+  ///
   /// Normally used in [ZefyrView].
   ZefyrScope.view({
     ZefyrImageDelegate imageDelegate,
@@ -32,7 +44,9 @@ class ZefyrScope extends ChangeNotifier {
   })  : isEditable = false,
         _mode = ZefyrMode.view,
         _imageDelegate = imageDelegate,
-        _attrDelegate = attrDelegate;
+        _attrDelegate = attrDelegate {
+    _debugId = getZefyrInstanceDebugId();
+  }
 
   /// Creates editable scope.
   ///
@@ -57,6 +71,7 @@ class ZefyrScope extends ChangeNotifier {
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
         _renderContext = ZefyrRenderContext() {
+    _debugId = getZefyrInstanceDebugId();
     _selectionStyle = _controller.getSelectionStyle();
     _selection = _controller.selection;
     _controller.addListener(_handleControllerChange);
