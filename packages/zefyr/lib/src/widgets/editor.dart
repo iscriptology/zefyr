@@ -160,6 +160,10 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       _attrDelegate = widget.attrDelegate;
       _scope.attrDelegate = _attrDelegate;
     }
+    if (widget.searchDelegate != oldWidget.searchDelegate) {
+      // _searchDelegate = widget.searchDelegate;
+      _scope.searchDelegate = widget.searchDelegate;
+    }
   }
 
   @override
@@ -176,6 +180,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
         mode: widget.mode,
         imageDelegate: _imageDelegate,
         attrDelegate: _attrDelegate,
+        searchDelegate: widget.searchDelegate,
         controller: widget.controller,
         focusNode: widget.focusNode,
         focusScope: FocusScope.of(context),

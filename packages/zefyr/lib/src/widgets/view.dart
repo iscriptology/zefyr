@@ -21,9 +21,14 @@ class ZefyrView extends StatefulWidget {
   final NotusDocument document;
   final ZefyrImageDelegate imageDelegate;
   final ZefyrAttrDelegate attrDelegate;
+  final ZefyrSearchDelegate searchDelegate;
 
   const ZefyrView(
-      {Key key, @required this.document, this.imageDelegate, this.attrDelegate})
+      {Key key,
+      @required this.document,
+      this.imageDelegate,
+      this.attrDelegate,
+      this.searchDelegate})
       : super(key: key);
 
   @override
@@ -48,6 +53,7 @@ class ZefyrViewState extends State<ZefyrView> {
     super.didUpdateWidget(oldWidget);
     _scope.imageDelegate = widget.imageDelegate;
     _scope.attrDelegate = widget.attrDelegate;
+    _scope.searchDelegate = widget.searchDelegate;
   }
 
   @override

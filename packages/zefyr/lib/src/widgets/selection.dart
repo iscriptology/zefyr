@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/util.dart';
+import 'package:zefyr/zefyr.dart';
 
 import 'controller.dart';
 import 'editable_box.dart';
@@ -17,8 +19,8 @@ import 'scope.dart';
 
 RenderEditableBox _getEditableBox(HitTestResult result) {
   for (var entry in result.path) {
-    if (entry.target is RenderEditableBox) {
-      return entry.target as RenderEditableBox;
+    if (entry.target is RenderEditableProxyBox) {
+      return entry.target;
     }
   }
   return null;
@@ -165,25 +167,30 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   @override
   Widget build(BuildContext context) {
-    final overlay = GestureDetector(
+    final overChild = Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        SelectionHandleDriver(
+          position: _SelectionHandlePosition.base,
+          selectionOverlay: this,
+        ),
+        SelectionHandleDriver(
+          position: _SelectionHandlePosition.extent,
+          selectionOverlay: this,
+        ),
+      ],
+    );
+
+    // we have a layer that can absorb onTap.
+    // gesturedetector seems to compete..
+    // TextSelectionGestureDetector is used by TextField (but it still stealth the onTap event)
+    final overlay = Listener(
       behavior: HitTestBehavior.translucent,
-      onTapDown: _handleTapDown,
-      onTap: _handleTap,
-      onTapCancel: _handleTapCancel,
-      onLongPress: _handleLongPress,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          SelectionHandleDriver(
-            position: _SelectionHandlePosition.base,
-            selectionOverlay: this,
-          ),
-          SelectionHandleDriver(
-            position: _SelectionHandlePosition.extent,
-            selectionOverlay: this,
-          ),
-        ],
-      ),
+      onPointerDown: _handleTapDown,
+      onPointerUp: _handleTap,
+      onPointerCancel: (_) => _handleTapCancel(),
+      // onSingleLongTapStart: _handleLongPress,
+      child: overChild,
     );
     return Container(child: overlay);
   }
@@ -228,8 +235,8 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     });
   }
 
-  void _handleTapDown(TapDownDetails details) {
-    _lastTapDownPosition = details.globalPosition;
+  void _handleTapDown(PointerDownEvent details) {
+    _lastTapDownPosition = details.position;
   }
 
   void _handleTapCancel() {
@@ -238,14 +245,31 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _lastTapDownPosition = null;
   }
 
-  void _handleTap() {
+  // we do not manage the selection if the tap is on a zone handled by one of our sub block
+  // if we have another editor embedded, it will receive the blockBoxHitTestEntry but should not pay attention (wrong debug id), it is on top.
+  bool _areWeBlocked(result) {
+    for (var entry in result.path) {
+      if (entry is BlockBoxHitTestEntry) {
+        // print('are we blocked: ${scope.debugId} scope: ${entry.scopeDebugId}');
+        if (scope.debugId == entry.scopeDebugId) return true;
+      }
+    }
+    return false;
+  }
+
+  void _handleTap(PointerUpEvent p) {
     assert(_lastTapDownPosition != null);
     final globalPoint = _lastTapDownPosition;
     _lastTapDownPosition = null;
     HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
 
-    RenderEditableProxyBox box = _getEditableBox(result);
+    if (_areWeBlocked(result) == true) {
+      print('### #### not for us ${_scope.debugId}');
+      return;
+    }
+
+    var box = _getEditableBox(result) as RenderEditableProxyBox;
     if (box == null) {
       box = _scope.renderContext.closestBoxForGlobalPoint(globalPoint);
     }
@@ -270,7 +294,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _scope.controller.updateSelection(selection, source: ChangeSource.local);
   }
 
-  void _handleLongPress() {
+  void _handleLongPress(_) {
     final Offset globalPoint = _longPressPosition;
     _longPressPosition = null;
     HitTestResult result = HitTestResult();

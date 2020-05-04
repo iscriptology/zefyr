@@ -7,6 +7,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/rich_text.dart';
+import 'package:zefyr/zefyr.dart';
 
 import 'caret.dart';
 import 'render_context.dart';
@@ -238,14 +240,6 @@ class RenderEditableProxyBox extends RenderBox
   @override
   bool hitTestSelf(Offset position) => true;
 
-  @override
-  bool hitTest(HitTestResult result, {Offset position}) {
-    if (size.contains(position)) {
-      result.add(BoxHitTestEntry(this, position));
-      return true;
-    }
-    return false;
-  }
 
   //
   // Proxy methods

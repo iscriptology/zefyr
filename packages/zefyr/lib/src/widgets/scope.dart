@@ -41,10 +41,12 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrScope.view({
     ZefyrImageDelegate imageDelegate,
     ZefyrAttrDelegate attrDelegate,
+    ZefyrSearchDelegate searchDelegate,
   })  : isEditable = false,
         _mode = ZefyrMode.view,
         _imageDelegate = imageDelegate,
-        _attrDelegate = attrDelegate {
+        _attrDelegate = attrDelegate,
+        _searchDelegate = searchDelegate {
     _debugId = getZefyrInstanceDebugId();
   }
 
@@ -58,6 +60,7 @@ class ZefyrScope extends ChangeNotifier {
     @required FocusScopeNode focusScope,
     ZefyrImageDelegate imageDelegate,
     ZefyrAttrDelegate attrDelegate,
+    ZefyrSearchDelegate searchDelegate,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
@@ -67,6 +70,7 @@ class ZefyrScope extends ChangeNotifier {
         _controller = controller,
         _imageDelegate = imageDelegate,
         _attrDelegate = attrDelegate,
+        _searchDelegate = searchDelegate,
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
@@ -98,6 +102,15 @@ class ZefyrScope extends ChangeNotifier {
   set attrDelegate(ZefyrAttrDelegate value) {
     if (_attrDelegate != value) {
       _attrDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  ZefyrSearchDelegate _searchDelegate;
+  ZefyrSearchDelegate get searchDelegate => _searchDelegate;
+  set searchDelegate(ZefyrSearchDelegate value) {
+    if (_searchDelegate != value) {
+      _searchDelegate = value;
       notifyListeners();
     }
   }

@@ -41,6 +41,12 @@ abstract class ZefyrImageDelegate<S> {
   Future<String> pickImage(S source);
 }
 
+class BlockBoxHitTestEntry extends BoxHitTestEntry {
+  BlockBoxHitTestEntry(RenderBox target, Offset position, this.scopeDebugId)
+      : super(target, position);
+  final int scopeDebugId;
+}
+
 class ZefyrImage extends StatefulWidget {
   const ZefyrImage({Key key, @required this.node, @required this.delegate})
       : super(key: key);
@@ -62,7 +68,7 @@ class _ZefyrImageState extends State<ZefyrImage> {
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
     final image = widget.delegate.buildImage(context, imageSource);
-    return _EditableImage(
+    return AnEditableImage(
       child: Padding(
         padding: theme.defaultLineTheme.padding,
         child: image,
@@ -72,16 +78,18 @@ class _ZefyrImageState extends State<ZefyrImage> {
   }
 }
 
-class _EditableImage extends SingleChildRenderObjectWidget {
-  _EditableImage({@required Widget child, @required this.node})
+class AnEditableImage extends SingleChildRenderObjectWidget {
+  AnEditableImage(
+      {@required Widget child, @required this.node, @required this.debugId})
       : assert(node != null),
         super(child: child);
 
   final EmbedNode node;
+  final int debugId;
 
   @override
   RenderEditableImage createRenderObject(BuildContext context) {
-    return RenderEditableImage(node: node);
+    return RenderEditableImage(node: node, debugId: debugId);
   }
 
   @override
@@ -94,15 +102,30 @@ class _EditableImage extends SingleChildRenderObjectWidget {
 class RenderEditableImage extends RenderBox
     with RenderObjectWithChildMixin<RenderBox>, RenderProxyBoxMixin<RenderBox>
     implements RenderEditableBox {
-  RenderEditableImage({
-    RenderImage child,
-    @required EmbedNode node,
-  }) : node = node {
+  RenderEditableImage(
+      {RenderImage child, @required EmbedNode node, @required this.debugId})
+      : node = node {
     this.child = child;
   }
 
+  final int debugId;
+
   @override
   EmbedNode node;
+
+  // we return a special blockhittest to avoid the selection layer to move the selection.
+  //
+  @override
+  bool hitTest(BoxHitTestResult result, {ui.Offset position}) {
+    if (size.contains(position)) {
+      if (hitTestChildren(result, position: position) ||
+          hitTestSelf(position)) {
+        result.add(BlockBoxHitTestEntry(this, position, debugId));
+        return true;
+      }
+    }
+    return false;
+  }
 
   // TODO: Customize caret height offset instead of adjusting here by 2px.
   @override

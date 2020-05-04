@@ -113,6 +113,8 @@ class ZefyrButton extends StatelessWidget {
       if (attribute is NotusAttribute) {
         return () => _toggleAttribute(attribute, editor);
       }
+    } else if (action == ZefyrToolbarAction.block) {
+      return () => toolbar.widget.searchDelegate.onBlock();
     } else if (action == ZefyrToolbarAction.mention) {
       return () => toolbar.widget.searchDelegate.onMention();
     } else if (action == ZefyrToolbarAction.close) {
