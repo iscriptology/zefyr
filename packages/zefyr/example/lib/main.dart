@@ -1,6 +1,8 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:example/src/block_page.dart';
+import 'package:example/src/flutter_editor_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -33,14 +35,25 @@ class ZefyrApp extends StatelessWidget {
         }),
       debugShowCheckedModeBanner: false,
       title: 'Zefyr Editor',
+      // home: buildBlockPage(context),
       home: HomePage(),
       routes: {
         "/fullPage": buildFullPage,
+        "/block": buildBlockPage,
         "/form": buildFormPage,
         "/view": buildViewPage,
         "/textinput": buildTextFieldPage,
+        "/flute": buildFlutePage,
       },
     );
+  }
+
+  Widget buildFlutePage(BuildContext context) {
+    return FlutterEditorScreen();
+  }
+
+  Widget buildBlockPage(BuildContext context) {
+    return BlockEditorScreen();
   }
 
   Widget buildFullPage(BuildContext context) {
@@ -74,12 +87,20 @@ class HomePage extends StatelessWidget {
             child: Text('Full page editor'),
           ),
           RaisedButton(
+            onPressed: () => nav.pushNamed('/block'),
+            child: Text('Embedded blocks'),
+          ),
+          RaisedButton(
             onPressed: () => nav.pushNamed('/form'),
             child: Text('Embedded in a form'),
           ),
           RaisedButton(
             onPressed: () => nav.pushNamed('/view'),
             child: Text('Read-only embeddable view'),
+          ),
+          RaisedButton(
+            onPressed: () => nav.pushNamed('/flute'),
+            child: Text('basic text input'),
           ),
           RaisedButton(
             onPressed: () => nav.pushNamed('/textinput'),
