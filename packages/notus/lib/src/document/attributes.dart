@@ -75,6 +75,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.bold.key: NotusAttribute.bold,
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.link.key: NotusAttribute.link,
+    NotusAttribute.math.key: NotusAttribute.math,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
@@ -90,6 +91,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Link style attribute.
   static const link = LinkAttributeBuilder._();
+  /// Math style attribute
+  static const math = MathAttributeBuilder._();
 
   // Line attributes
 
@@ -341,6 +344,19 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
       NotusAttribute<String>._(key, scope, value);
 }
 
+/// Builder for math attribute values.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.math] instead.
+class MathAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kMath = 'math';
+  const MathAttributeBuilder._() : super._(_kMath, NotusAttributeScope.inline);
+
+  /// Creates a link attribute with specified link [value].
+  NotusAttribute<String> fromString(String value) =>
+      NotusAttribute<String>._(key, scope, value);
+}
+
 /// Builder for heading attribute styles.
 ///
 /// There is no need to use this class directly, consider using
@@ -379,6 +395,9 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a code snippet, using monospace font.
   NotusAttribute<String> get code =>
       NotusAttribute<String>._(key, scope, 'code');
+
+  NotusAttribute<String> get math =>
+      NotusAttribute<String>._(key, scope, 'math');
 
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>

@@ -9,8 +9,7 @@ class ZefyrScaffold extends StatefulWidget {
   const ZefyrScaffold({Key key, this.child}) : super(key: key);
 
   static ZefyrScaffoldState of(BuildContext context) {
-    final _ZefyrScaffoldAccess widget =
-        context.dependOnInheritedWidgetOfExactType<_ZefyrScaffoldAccess>();
+    final _ZefyrScaffoldAccess widget = context.dependOnInheritedWidgetOfExactType<_ZefyrScaffoldAccess>();
     return widget?.scaffold;
   }
 
@@ -37,8 +36,7 @@ class ZefyrScaffoldState extends State<ZefyrScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final toolbar =
-        (_toolbarBuilder == null) ? Container() : _toolbarBuilder(context);
+    final toolbar = (_toolbarBuilder == null) ? Container() : _toolbarBuilder(context);
     return _ZefyrScaffoldAccess(
       scaffold: this,
       child: Column(

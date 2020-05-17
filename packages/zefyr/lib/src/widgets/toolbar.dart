@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/math_button.dart';
 
 import 'buttons.dart';
 import 'scope.dart';
@@ -33,6 +34,7 @@ enum ZefyrToolbarAction {
   galleryImage,
   hideKeyboard,
   close,
+  math,
   confirm,
 }
 
@@ -47,6 +49,7 @@ final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.bulletList: NotusAttribute.block.bulletList,
   ZefyrToolbarAction.numberList: NotusAttribute.block.numberList,
   ZefyrToolbarAction.code: NotusAttribute.block.code,
+  ZefyrToolbarAction.math: NotusAttribute.block.math,
   ZefyrToolbarAction.quote: NotusAttribute.block.quote,
   ZefyrToolbarAction.horizontalRule: NotusAttribute.embed.horizontalRule,
 };
@@ -77,8 +80,6 @@ class ZefyrToolbarScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context).toolbarTheme;
     final toolbar = ZefyrToolbar.of(context);
-    final constraints =
-        BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
     final children = <Widget>[
       Expanded(child: body),
     ];
@@ -89,19 +90,18 @@ class ZefyrToolbarScaffold extends StatelessWidget {
       children.add(toolbar.buildButton(context, ZefyrToolbarAction.close));
     }
     return Container(
-      constraints: constraints,
       child: Material(color: theme.color, child: Row(children: children)),
     );
   }
 }
 
 /// Toolbar for [ZefyrEditor].
-class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
+class ZefyrToolbar extends StatefulWidget {
   static const kToolbarHeight = 50.0;
-
   const ZefyrToolbar({
     Key key,
     @required this.editor,
+
     this.autoHide = true,
     this.delegate,
   }) : super(key: key);
@@ -121,8 +121,6 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   @override
   ZefyrToolbarState createState() => ZefyrToolbarState();
 
-  @override
-  ui.Size get preferredSize => Size.fromHeight(ZefyrToolbar.kToolbarHeight);
 }
 
 class _ZefyrToolbarScope extends InheritedWidget {
@@ -250,9 +248,10 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   List<Widget> _buildButtons(BuildContext context) {
     final buttons = <Widget>[
+      MathButton(),
+      LinkButton(),
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
-      LinkButton(),
       HeadingButton(),
       buildButton(context, ZefyrToolbarAction.bulletList),
       buildButton(context, ZefyrToolbarAction.numberList),
